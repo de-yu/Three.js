@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Geometry</title>
+</head>
+
+<body>
+
+</body>
+<script type="importmap">
+		{
+			"imports": {
+				"three":"../lib/three/build/three.module.js"
+			}
+		}
+	</script>
+<script type="module">
+
+  import * as THREE from '../lib/three/build/three.module.js';
+  import { OrbitControls } from '../lib/three/examples/jsm/controls/OrbitControls.js';
+  import { GUI } from '../lib/three/examples/jsm/libs/lil-gui.module.min.js';
+
+  
+  let positionArr = []
+  let scene, camera;
+  let plane, cube;
+  let clock = new THREE.Clock();
+
+  scene = new THREE.Scene()
+  scene.background = new THREE.Color(0x666666);
+
+  camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 1, 1500);
+  camera.position.set(0, 200, 400);
+
+  let cameraTarget = new THREE.Vector3(0, 115, -100);
+
+  setPosition()
+  light()
+  setCube(0) // 方形
+  setCapSule(1) // 膠囊
+  setCircle(2) // 圓面
+  setCone(3) // 錐形
+  setCylinder(4) // 柱體
+  setDodecahedron(5) // 12 面體
+  setEdges(6) //  邊框
+  setExtrudeGeometry(7) // 拉伸幾何體
+  setIcosahedron(8) // 20 面體
+  setLathe(9) // 線構圖
+  setOctahedron(10) // 8 面體
+  setPlane(11) // 無厚度平面
+  setRing(12) // 圓環
+  setShape(13) // 自定義平面
+  setSphere(14) // 球體
+  setTetrahedron(15) // 四面體
+  setTorus(16) // 環形
+  setTorusKnot(17) // 環形結
+  setTube(18) // 管道
+  setWireFrame(19) // 線框
+
+  setGround()
+  camera.lookAt(cameraTarget);
+
+  let renderer = new THREE.WebGLRenderer({ antialias: true })
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true  // 顯示 shadow
+  document.body.appendChild(renderer.domElement)
+
+  const controls = new OrbitControls(camera, renderer.domElement);  // 可拖曳控制
+
+  renderer.render(scene, camera);
+
+  animate()
+
+  function light() {
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    const pointLight = new THREE.PointLight(0xffffff,1,1000,5);
+
+    pointLight.penumbra = 0.3;
+    pointLight.position.set(0, 250, -100);
+    pointLight.castShadow = true; 
+    pointLight.shadow.camera.near = 15;
+    pointLight.shadow.camera.far = 150;
+    pointLight.shadow.mapSize.width = 1024;
+    pointLight.shadow.mapSize.height = 1024;
+
+    scene.add(pointLight);
+  }
+
+  function setPosition() {
+    for(let z=-200;z < 50; z += 50) {
+      for(let x=-100;x < 150;x += 50) {
+        positionArr.push([x,135,z])
+      }
+    }
+  }
+
+  function setCube(index) {
+
+    const geometry = new THREE.BoxGeometry(20,20,20);
+    const material = new THREE.MeshStandardMaterial( {
+					metalness: 0,
+					roughness: 0,
+					envMapIntensity: 1.0
+				});
+    cube = new THREE.Mesh( geometry, material );
+    cube.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( cube );
+  }
+
+  function setCapSule(index) {
+    const geometry = new THREE.CapsuleGeometry( 10, 10, 40, 80 );
+    const material =  new THREE.MeshStandardMaterial( {
+					metalness: 0,
+					roughness: 0,
+					envMapIntensity: 1.0
+				});
+    const capsule = new THREE.Mesh( geometry, material );
+    capsule.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( capsule );
+  }
+
+  function setCircle(index) {
+    const geometry = new THREE.CircleGeometry( 20, 32);
+    const material = new THREE.MeshStandardMaterial( {
+        metalness: 0,
+        roughness: 0,
+        envMapIntensity: 1.0,
+        side: THREE.DoubleSide 
+    });
+    const circle = new THREE.Mesh( geometry, material );
+    circle.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( circle );
+  }
+
+  function setCone(index) {
+    const geometry = new THREE.ConeGeometry( 20, 50, 32 );
+    const material = new THREE.MeshStandardMaterial( {
+        metalness: 0,
+        roughness: 0,
+        envMapIntensity: 1.0
+    });
+    const cone = new THREE.Mesh( geometry, material );
+    cone.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( cone );
+  }
+
+  function setCylinder(index) {
+    const geometry = new THREE.CylinderGeometry( 20, 20, 20, 32 );
+    const material = new THREE.MeshStandardMaterial( {
+        metalness: 0,
+        roughness: 0,
+        envMapIntensity: 1.0
+    });
+    const cylinder = new THREE.Mesh( geometry, material );
+    cylinder.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( cylinder );
+  }
+
+  function setDodecahedron(index) {
+    // 正 12 面體
+    const geometry = new THREE.DodecahedronGeometry( 20 );
+    const material = new THREE.MeshStandardMaterial( {
+        metalness: 0,
+        roughness: 0,
+        envMapIntensity: 1.0
+    });
+    const dodecahedron = new THREE.Mesh( geometry, material );
+    dodecahedron.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( dodecahedron );
+  } 
+
+  function setEdges(index) {
+    const geometry = new THREE.BoxGeometry( 20, 20, 20 );
+    const edges = new THREE.EdgesGeometry( geometry );
+    const line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+
+    line.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( line );
+  }
+
+  function setExtrudeGeometry(index) {
+    const length = 12, width = 8;
+
+    const shape = new THREE.Shape();
+    shape.moveTo( 0,0 );
+    shape.lineTo( 0, width );
+    shape.lineTo( length, width );
+    shape.lineTo( length, 0 );
+    shape.lineTo( 0, 0 );
+
+    const extrudeSettings = {
+      steps: 2,
+      depth: 16,
+      bevelEnabled: true,
+      bevelThickness: 1,
+      bevelSize: 1,
+      bevelOffset: 0,
+      bevelSegments: 1
+    };
+
+    const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+    const material = new THREE.MeshStandardMaterial( {
+        metalness: 0,
+        roughness: 0,
+        envMapIntensity: 1.0
+    });
+    const mesh = new THREE.Mesh( geometry, material ) ;
+    mesh.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( mesh );
+  }
+
+  function setIcosahedron(index) {
+    // 正20面體
+    const geometry = new THREE.IcosahedronGeometry( 20 );
+    const material = new THREE.MeshStandardMaterial( {
+        metalness: 0,
+        roughness: 0,
+        envMapIntensity: 1.0
+    });
+    const dodecahedron = new THREE.Mesh( geometry, material );
+    dodecahedron.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( dodecahedron );
+  }
+
+  function setLathe(index) {
+    const points = [];
+    for ( let i = 0; i < 10; i ++ ) {
+      points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 10 + 5, ( i - 5 ) * 2 ) );
+    }
+    const geometry = new THREE.LatheGeometry( points , 10);
+    const material = new THREE.MeshStandardMaterial( {
+        metalness: 0,
+        roughness: 0,
+        envMapIntensity: 1.0,
+        side: THREE.DoubleSide 
+    });
+    const lathe = new THREE.Mesh( geometry, material );
+    lathe.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( lathe );
+  }
+
+  function setOctahedron(index) {
+    // 正八面體
+    const geometry = new THREE.OctahedronGeometry( 20 );
+    const material = new THREE.MeshStandardMaterial( {
+        metalness: 0,
+        roughness: 0,
+        envMapIntensity: 1.0
+    });
+    const octahedron = new THREE.Mesh( geometry, material );
+    octahedron.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( octahedron );
+  }
+
+  function setPlane(index) {
+    const geometry = new THREE.PlaneGeometry( 10, 10 );
+    const material = new THREE.MeshStandardMaterial( {
+        metalness: 0,
+        roughness: 0,
+        envMapIntensity: 1.0
+    });
+    const plane = new THREE.Mesh( geometry, material );
+    plane.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( plane );
+  }
+
+  function setRing(index) {
+    const geometry = new THREE.RingGeometry( 5, 10, 32 );
+    const material = new THREE.MeshStandardMaterial( {
+        metalness: 0,
+        roughness: 0,
+        envMapIntensity: 1.0,
+        side: THREE.DoubleSide 
+    });
+    const mesh = new THREE.Mesh( geometry, material );
+    mesh.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( mesh );
+  }
+
+  function setShape(index) {
+    const x = 0, y = 0;
+
+    const heartShape = new THREE.Shape();
+
+    heartShape.moveTo( x + 5, y + 5 );
+    heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
+    heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
+    heartShape.bezierCurveTo( x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19 );
+    heartShape.bezierCurveTo( x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7 );
+    heartShape.bezierCurveTo( x + 16, y + 7, x + 16, y, x + 10, y );
+    heartShape.bezierCurveTo( x + 7, y, x + 5, y + 5, x + 5, y + 5 );
+
+    const geometry = new THREE.ShapeGeometry( heartShape );
+    const material = new THREE.MeshStandardMaterial( {
+            metalness: 0,
+            roughness: 0,
+            envMapIntensity: 1.0,
+            side: THREE.DoubleSide 
+        });
+    const mesh = new THREE.Mesh( geometry, material ) ;
+    mesh.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( mesh );
+  }
+
+  function setSphere(index) {
+    const geometry = new THREE.SphereGeometry( 15, 32, 16 );    
+    const material = new THREE.MeshStandardMaterial( {
+            metalness: 0,
+            roughness: 0,
+            envMapIntensity: 1.0,
+        });
+    const sphere = new THREE.Mesh( geometry, material );
+    sphere.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( sphere );
+  }
+
+  function setTetrahedron(index) {
+    const geometry = new THREE.TetrahedronGeometry( 15);    
+    const material = new THREE.MeshStandardMaterial( {
+            metalness: 0,
+            roughness: 0,
+            envMapIntensity: 1.0,
+        });
+    const tetrahedron = new THREE.Mesh( geometry, material );
+    tetrahedron.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( tetrahedron );
+  }
+
+
+  function setTorus(index) {
+    const geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
+    const material = new THREE.MeshStandardMaterial( {
+            metalness: 0,
+            roughness: 0,
+            envMapIntensity: 1.0,
+        });
+    const torus = new THREE.Mesh( geometry, material );
+    torus.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( torus );
+  }
+
+  function setTorusKnot(index) {
+    const geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
+    const material = new THREE.MeshStandardMaterial( {
+            metalness: 0,
+            roughness: 0,
+            envMapIntensity: 1.0,
+        });
+    const torusKnot = new THREE.Mesh( geometry, material );
+    torusKnot.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( torusKnot );
+  }
+
+  function setTube(index) {
+    class CustomSinCurve extends THREE.Curve {
+
+    constructor( scale = 1 ) {
+
+      super();
+
+      this.scale = scale;
+
+    }
+
+    getPoint( t, optionalTarget = new THREE.Vector3() ) {
+
+      const tx = t * 3 - 1.5;
+      const ty = Math.sin( 2 * Math.PI * t );
+      const tz = 0;
+
+      return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );
+
+    }
+
+    }
+
+    const path = new CustomSinCurve( 10 );
+    const geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );
+    const material = new THREE.MeshStandardMaterial( {
+            metalness: 0,
+            roughness: 0,
+            envMapIntensity: 1.0,
+        });
+    const mesh = new THREE.Mesh( geometry, material );
+    mesh.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( mesh );
+  }
+
+  function setWireFrame(index) {
+    const geometry = new THREE.SphereGeometry( 10, 10, 10 );
+
+    const wireframe = new THREE.WireframeGeometry( geometry );
+
+    const line = new THREE.LineSegments( wireframe );
+    line.material.depthTest = false;
+    line.material.opacity = 0.25;
+    line.material.transparent = true;
+    line.position.set(positionArr[index][0], positionArr[index][1], positionArr[index][2])
+    scene.add( line );
+  }
+  
+
+
+  function setGround() {
+    plane = new THREE.Mesh(
+      new THREE.BoxGeometry(100, 1, 100),
+      new THREE.MeshPhongMaterial({
+        color: 0xa0adaf,
+        shininess: 150,
+        specular: 0x111111
+      })
+    );
+
+    plane.scale.multiplyScalar(3);
+    plane.castShadow = false;
+    plane.receiveShadow = true;
+    plane.position.set(0, 115, -100)
+    scene.add(plane);
+  }
+
+  function animate () {
+    requestAnimationFrame(animate);
+    camera.lookAt(cameraTarget);
+    renderer.clear();
+    renderer.render(scene, camera);
+  }
+
+
+</script>
+
+</html>
