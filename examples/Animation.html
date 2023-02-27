@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Animation</title>
+  <style>
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="main"></canvas>
+</body>
+<script type="importmap">
+  {
+    "imports": {
+      "three":"../lib/three/build/three.module.js"
+    }
+  }
+</script>
+<script type="module">
+
+import * as THREE from '../lib/three/build/three.module.js';
+import { OrbitControls } from '../lib/three/examples/jsm/controls/OrbitControls.js';
+
+  let sphere;
+  
+  const clock = new THREE.Clock()
+  // scene
+  let scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x000000);
+
+  // camera
+  let camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 1, 1500);
+  camera.position.set(0, 300, 600);
+
+  let cameraTarget = new THREE.Vector3(0, 110, 0);
+
+  createPlane() // 建立地板
+  createLight()
+  setSphere()
+
+  let renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('main'), antialias: true })
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true  // 顯示 shadow
+  const controls = new OrbitControls(camera, renderer.domElement);  // 可拖曳控制
+
+  animate()
+
+  function createLight() {
+    const pointLight = new THREE.PointLight(0xffffff, 2 , 300 ,4)
+    pointLight.position.set(0, 140, 0);
+    pointLight.castShadow = true
+    scene.add( pointLight );
+
+    pointLight.shadow.camera.near = 15;
+    pointLight.shadow.camera.far = 200;
+    pointLight.shadow.mapSize.width = 1024;
+    pointLight.shadow.mapSize.height = 1024;
+
+
+    const light = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.2 );
+    scene.add( light )
+  }
+
+  function createPlane () {
+    const plane = new THREE.Mesh(
+      new THREE.BoxGeometry(100, 1, 100),
+      new THREE.MeshPhongMaterial({
+        color: 0xa0adaf,
+        shininess: 150,
+        specular: 0x111111
+      })
+    );
+
+    plane.scale.multiplyScalar(3);
+    plane.castShadow = false;
+    plane.receiveShadow = true;
+    plane.position.set(0, 100, 0)
+
+    scene.add(plane);
+  }
+
+
+  function setSphere() {
+    const geometry = new THREE.SphereGeometry( 15, 32, 16 );    
+    const material = new THREE.MeshStandardMaterial( {
+            metalness: 0,
+            roughness: 0,
+            envMapIntensity: 1.0,
+        });
+    sphere = new THREE.Mesh( geometry, material );
+    sphere.castShadow = true;
+    sphere.position.y = 115
+    scene.add( sphere );
+  }
+
+  function circleAnimation() {
+    const elapsedTime = clock.getElapsedTime()
+    sphere.position.x = 100*Math.sin(elapsedTime)
+    sphere.position.z = 100*Math.cos(elapsedTime)
+  }
+
+  function animate () {
+    requestAnimationFrame(animate);
+    camera.lookAt(cameraTarget);
+    renderer.clear();
+    renderer.render(scene, camera);
+    circleAnimation()
+  }
+</script>
+
+</html>
